@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results</title>
+</head>
+<body>
+    <h1>Results</h1>
+    <p><strong>Similarity:</strong> {{ similarity }}</p>
+    <p><strong>Missing Keywords/Concepts:</strong> {{ missing_keywords }}</p>
+    <p><strong>Suggestions on what to add:</strong></p>
+    <pre>{{ suggestions }}</pre>
+    <a href="{% url 'upload_file' %}">Upload Another File</a>
+    <a href="{% url 'ask_ai' %}">Ask AI</a>
+</body>
+</html>

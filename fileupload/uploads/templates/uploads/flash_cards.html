@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcard Study App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    .flashcard-container {
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+
+    .flashcard {
+      width: 300px;
+      height: 200px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+
+    .flashcard div {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+      text-align: center;
+    }
+
+    .front {
+      background-color: #fff;
+      position: relative;
+      left: -22px;
+    }
+
+    .back {
+      background-color: #f8d7da;
+      transform: rotateY(180deg);
+      position: relative;
+      left: -22px;
+    }
+
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+    }
+
+    .navigation button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .navigation button:hover {
+      background-color: #0056b3;
+    }
+
+    .full_container {
+      position: absolute;
+    }
+
+    @keyframes slideRightFadeOut {
+      0% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+    }
+
+    @keyframes slideLeftFadeOut {
+      0% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(-100px);
+        opacity: 0;
+      }
+    }
+
+    @keyframes slideRightFadeIn {
+      0% {
+        transform: translateX(-100px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideLeftFadeIn {
+      0% {
+        transform: translateX(100px);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .slide-right-out {
+      animation: slideRightFadeOut 0.5s forwards;
+    }
+
+    .slide-left-out {
+      animation: slideLeftFadeOut 0.5s forwards;
+    }
+
+    .slide-right-in {
+      animation: slideRightFadeIn 0.5s forwards;
+    }
+
+    .slide-left-in {
+      animation: slideLeftFadeIn 0.5s forwards;
+    }
+  </style>
+</head>
+<body>
+  <div class="full_container">
+    <div class="flashcard-container">
+      <div class="flashcard" id="flashcard">
+        <div class="front"></div>
+        <div class="back"></div>
+      </div>
+    </div>
+    <div class="navigation">
+      <button id="prevButton">Previous</button>
+      <button id="nextButton">Next</button>
+    </div>
+  </div>
+  <script>
+    // Flashcards data passed from Django using template tags
+    const flashcards = [
+      {% for flashcard in flashcards_data %}
+        {
+          term: "{{ flashcard.term|escapejs }}",
+          definition: "{{ flashcard.definition|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ];
+
+    let currentIndex = 0;
+    let isAnimating = false;  // Variable to track animation state
+
+    const flashcard = document.getElementById('flashcard');
+    const front = flashcard.querySelector('.front');
+    const back = flashcard.querySelector('.back');
+
+    function updateFlashcard(index) {
+      front.textContent = flashcards[index].term;
+      back.textContent = flashcards[index].definition;
+      flashcard.classList.remove('flipped'); // Ensure the card is always showing the front
+    }
+
+    function showNextFlashcard() {
+      if (isAnimating) return;  // Prevent action if an animation is already running
+      isAnimating = true;  // Set animation state to true
+      flashcard.classList.add('slide-right-out');
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % flashcards.length;
+        updateFlashcard(currentIndex);
+        flashcard.classList.remove('slide-right-out');
+        flashcard.classList.add('slide-right-in');
+      }, 500); // Delay should match animation duration
+
+      setTimeout(() => {
+        flashcard.classList.remove('slide-right-in');
+        isAnimating = false;  // Reset animation state to false
+      }, 1000); // Total delay to reset the animation state
+    }
+
+    function showPrevFlashcard() {
+      if (isAnimating) return;  // Prevent action if an animation is already running
+      isAnimating = true;  // Set animation state to true
+      flashcard.classList.add('slide-left-out');
+      setTimeout(() => {
+        currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+        updateFlashcard(currentIndex);
+        flashcard.classList.remove('slide-left-out');
+        flashcard.classList.add('slide-left-in');
+      }, 500); // Delay should match animation duration
+
+      setTimeout(() => {
+        flashcard.classList.remove('slide-left-in');
+        isAnimating = false;  // Reset animation state to false
+      }, 1000); // Total delay to reset the animation state
+    }
+
+    flashcard.addEventListener('click', () => {
+      if (isAnimating) return;  // Prevent flipping if an animation is running
+      flashcard.classList.toggle('flipped');
+    });
+
+    document.getElementById('nextButton').addEventListener('click', showNextFlashcard);
+    document.getElementById('prevButton').addEventListener('click', showPrevFlashcard);
+
+    updateFlashcard(currentIndex);
+  </script>
+</body>
+</html>

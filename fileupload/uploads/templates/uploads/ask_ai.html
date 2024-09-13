@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ask AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .conversation {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+            word-wrap: break-word;
+        }
+        .message.user {
+            background-color: #e1ffc7;
+            align-self: flex-end;
+        }
+        .message.ai {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+        }
+        .message p {
+            margin: 0;
+        }
+        .formatted-response {
+            white-space: pre-wrap; /* Preserve whitespace */
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ask AI</h1>
+        <div class="conversation">
+            {% if previous_questions %}
+                {% for question, answer in previous_questions %}
+                    <div class="message user">
+                        <p>{{ question }}</p>
+                    </div>
+                    <div class="message ai formatted-response">
+                        <p>{{ answer|safe }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% if latest_question %}
+                <div class="message user">
+                    <p>{{ latest_question }}</p>
+                </div>
+            {% endif %}
+            {% if response %}
+                <div class="message ai formatted-response">
+                    <p>{{ response|safe }}</p>
+                </div>
+            {% endif %}
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <label for="question">Question:</label>
+            <input type="text" id="question" name="question">
+            <button type="submit">Ask</button>
+        </form>
+        <a href="{% url 'upload_file' %}">Upload File</a>
+    </div>
+</body>
+</html>

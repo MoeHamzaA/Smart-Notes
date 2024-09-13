@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Successful</title>
+    {% load static %}
+    {% load custom_filters %}
+    <link rel="stylesheet" type="text/css" href="{% static 'uploads/css/success.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+    
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f9f9f9;
+            margin: 20px auto;
+            max-width: 80%;
+        }
+    
+        .info-container, .suggestion-container {
+            flex: 1;
+            border: 1px solid black;
+            margin: 0 10px;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+    
+        .info-container h1 {
+            font-size: 24px;
+            color: #333;
+        }
+    
+        .info-container p, .info-container ul {
+            font-size: 16px;
+            color: #555;
+        }
+    
+        ul {
+            list-style-type: disc;
+            margin: 0;
+            padding-left: 20px;
+        }
+    
+        li {
+            margin-bottom: 2px; /* Reduce spacing between list items */
+            line-height: 1.2; /* Tighter line height */
+        }
+    
+        .formatted-suggestions {
+            white-space: normal; /* Change from pre-wrap to normal */
+            font-size: 16px;
+            color: #555;
+            line-height: 1.2; /* Tighter line height */
+            margin: 0; /* Remove any default margin */
+            padding: 0; /* Remove any default padding */
+        }
+    
+        a {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+    
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <div class="info-container">
+            <h1>Upload Successful</h1>
+            
+            <p>Similarity: {{ similarity }}</p>
+            <p>Missing Keywords:</p>
+            <ul>
+                {% for keyword in missing_keywords %}
+                    <li>{{ keyword }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="suggestion-container">
+            <h2>Suggestions</h2>
+            <div class="formatted-suggestions">
+                {% for suggestion in suggestions %}
+                    <p>{{ suggestion|bold_text|safe }}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'ask_ai' %}">Ask AI a question</a>
+</body>
+</html>
